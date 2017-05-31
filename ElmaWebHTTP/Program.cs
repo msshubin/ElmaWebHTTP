@@ -47,48 +47,7 @@ namespace ElmaWebHTTP
             return result;
         }
 
-        public static void UploadFile(Auth auth, FileStream file)
-        {
-            Guid fileguid;
-
-            HttpWebRequest uploadfile = WebRequest.Create("http://localhost:8000/API/REST/Files/Upload") as HttpWebRequest;
-            uploadfile.Method = "POST";
-            uploadfile.Headers.Add("AuthToken", auth.AuthToken);
-            uploadfile.Headers.Add("SessionToken", auth.SessionToken);
-            //uploadfile.Timeout = 10000;
-            //uploadfile.ContentType = "text/plain; charset = utf - 8";
-
-            //uploadfile.ContentLength = file.ToByteArray().Length;
-
-
-            Stream sendStream = uploadfile.GetRequestStream();
-//            Console.WriteLine(sendStream.CanWrite);
-            sendStream.SetLength(file.ToByteArray().Length);
-
-            sendStream.Write(file.ToByteArray(), 0, file.ToByteArray().Length);
-            sendStream.Close();
-
-            // получение ответа
-            System.Net.WebResponse result = uploadfile.GetResponse();
-            var responseText = new StreamReader(result.GetResponseStream()).ReadToEnd();
-            Console.WriteLine(responseText);
-
-/*
-            var res = uploadfile.GetResponse() as HttpWebResponse;
-            var resStream = res.GetResponseStream();
-            var sr = new StreamReader(resStream, Encoding.UTF8);
-            var str = @sr.ReadToEnd();
-            */
-
-
-
-            //return null;
-        }
-
-
-
-
-        static void UploadFile3 (Auth auth)
+        static void UploadFile (Auth auth)
         {
             string filePath = @"C:\Users\shubin\Desktop\обратка.txt";
 
@@ -128,46 +87,6 @@ namespace ElmaWebHTTP
         public class MyGuid
         {
             public string Value { get; set; }
-        }
-
-        static void UploadFile2(Auth auth, string filename, string path)
-        {
-            var client = new RestClient("http://localhost:8000/API/REST/Files/Upload");
-
-            var request = new RestRequest("resource/{id}", Method.POST);
-            request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-            request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
-
-            // easily add HTTP Headers
-            request.AddHeader("AuthToken", auth.AuthToken);
-            request.AddHeader("SessionToken", auth.SessionToken);
-            request.AddHeader("FileName", "file.txt");
-
-            // add files to upload (works with compatible verbs)
-            request.AddFile(filename, path);
-
-            // execute the request
-            IRestResponse response = client.Execute(request);
-            var content = response.Content; // raw content as string
-            Console.WriteLine(content.ToString());
-
-            // or automatically deserialize result
-            // return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-            var response2 = client.Execute<MyGuid>(request);
-            var name = response2.Data.Value;
-            
-            // easy async support
-            client.ExecuteAsync(request, response => {
-                Console.WriteLine(response.Content);
-            });
-
-            // async with deserialization
-            var asyncHandle = client.ExecuteAsync<Person>(request, response => {
-                Console.WriteLine(response.Data.Name);
-            });
-
-            // abort the request on demand
-            asyncHandle.Abort();
         }
 
         static void Main(string[] args)
@@ -228,11 +147,7 @@ namespace ElmaWebHTTP
             //Open the stream and read it back.
             */
 
-            string path = @"C:\Users\shubin\Desktop\обратка.txt";
-            FileStream fs = File.OpenRead(path);
-
-            //UploadFile(auth, fs);
-            UploadFile3(auth);
+            UploadFile(auth);
 
             /*
             using (FileStream fs = File.OpenRead(path))
